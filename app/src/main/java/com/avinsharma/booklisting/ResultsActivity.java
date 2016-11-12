@@ -27,14 +27,16 @@ public class ResultsActivity extends AppCompatActivity implements LoaderManager.
         setContentView(R.layout.activity_results);
 
         search = getIntent().getExtras().getString("search");
+        if (search.contains(" "))
+            search = search.replaceAll(" ", "%20");
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         empty = (TextView) findViewById(R.id.empty);
-        getLoaderManager().initLoader(0,null,this).forceLoad();
+        getLoaderManager().initLoader(0, null, this).forceLoad();
     }
 
     @Override
     public Loader onCreateLoader(int i, Bundle bundle) {
-        return new BookLoader(getApplicationContext(),search);
+        return new BookLoader(getApplicationContext(), search);
     }
 
     @Override
@@ -54,15 +56,14 @@ public class ResultsActivity extends AppCompatActivity implements LoaderManager.
         ListView listView = (ListView) findViewById(R.id.list_view);
 
         // Create a new {@link ArrayAdapter} of earthquakes
-        BookAdapter adapter = new BookAdapter(this,books);
+        BookAdapter adapter = new BookAdapter(this, books);
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()){
+        if (networkInfo != null && networkInfo.isConnected()) {
             empty.setText("No data found");
-        }
-        else{
+        } else {
             empty.setText("No network");
         }
         listView.setEmptyView(empty);
@@ -71,8 +72,9 @@ public class ResultsActivity extends AppCompatActivity implements LoaderManager.
         listView.setAdapter(adapter);
     }
 
-    private static class BookLoader extends AsyncTaskLoader<ArrayList<Book>>{
+    private static class BookLoader extends AsyncTaskLoader<ArrayList<Book>> {
         String search;
+
         public BookLoader(Context context, String search) {
             super(context);
             this.search = search;

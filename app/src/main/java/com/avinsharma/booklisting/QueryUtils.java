@@ -24,10 +24,10 @@ public class QueryUtils {
     public static final String LOG_TAG = QueryUtils.class.getSimpleName();
     public static String baseURL = "https://www.googleapis.com/books/v1/volumes?q=";
 
-    private QueryUtils(){
+    private QueryUtils() {
     }
 
-    private static String createStringUrl(String search){
+    private static String createStringUrl(String search) {
         StringBuilder stringUrl = new StringBuilder(baseURL);
         stringUrl.append(search);
         stringUrl.append("&maxResults=8");
@@ -74,13 +74,13 @@ public class QueryUtils {
         return jsonResponse;
     }
 
-    private static String readFromStream(InputStream inputStream) throws IOException{
+    private static String readFromStream(InputStream inputStream) throws IOException {
         StringBuilder output = new StringBuilder();
-        if (inputStream != null){
+        if (inputStream != null) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
             BufferedReader reader = new BufferedReader(inputStreamReader);
             String line = reader.readLine();
-            while (line != null){
+            while (line != null) {
                 output.append(line);
                 line = reader.readLine();
             }
@@ -88,7 +88,7 @@ public class QueryUtils {
         return output.toString();
     }
 
-    private static ArrayList<Book> extractBooks(String jsonResponse){
+    private static ArrayList<Book> extractBooks(String jsonResponse) {
         ArrayList<Book> books = new ArrayList<>();
         if (jsonResponse == null)
             return books;
@@ -104,19 +104,25 @@ public class QueryUtils {
             String description;
             StringBuilder author;
 
-            for (int i=0;i<items.length();i++){
+            for (int i = 0; i < items.length(); i++) {
                 info = items.getJSONObject(i).getJSONObject("volumeInfo");
                 title = info.getString("title");
-                description = info.getString("description");
-                authorsJson = info.getJSONArray("authors");
-                author = new StringBuilder(authorsJson.getString(0));
-                for (int j=1;j<authorsJson.length();j++){
-                    author.append("\n"+authorsJson.getString(j));
-                }
-                books.add(new Book(title,description,author.toString()));
+                if (info.has("description"))
+                    description = info.getString("description");
+                else
+                    description = "No description";
+                if (info.has("authors")) {
+                    authorsJson = info.getJSONArray("authors");
+                    author = new StringBuilder(authorsJson.getString(0));
+                    for (int j = 1; j < authorsJson.length(); j++) {
+                        author.append("\n" + authorsJson.getString(j));
+                    }
+                } else
+                    author = new StringBuilder("No authors");
+                books.add(new Book(title, description, author.toString()));
             }
 
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
@@ -125,9 +131,9 @@ public class QueryUtils {
         return books;
     }
 
-    public static ArrayList<Book> fetchSearchResults(String search){
+    public static ArrayList<Book> fetchSearchResults(String search) {
 
-        Log.d(LOG_TAG,createStringUrl(search));
+        Log.d(LOG_TAG, createStringUrl(search));
         URL url = createUrl(createStringUrl(search));
         String jsonResponse = null;
         try {
