@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Book Listing</string>
+    <string name="APIKey">AIzaSyDWE-2v6_s3CcJ3Q4xZ2mrs0-qaXMiFNUA</string>
+    <string name="search_books">Search Books</string>
+    <string name="search">Search</string>
+    <string name="author">Author: </string>
+</resources>
